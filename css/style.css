@@ -1,20 +1,21 @@
-<?php
-	if(!isset($_SESSION)) 
-	{ 
-		session_start(); 
-		include('connection.php');
-		$username = $_SESSION['user'];
-	}
-?>
-<html lang="EN">
-	<head>
-		<meta charset="utf-8">
-		<style>
-			body {
-				font-family:"Tahoma",Arial Narrow;
-				font-size: 12px;
-			}
-			.holder {
+
+.error{
+	color:#F00;
+}
+.txtBox{
+	padding:3px;
+	width:200px;
+	border:1px solid #6C9;
+}
+.txtBox:hover{
+	padding:3px;
+	border:1px solid #66C;
+}
+
+
+
+/*chat page*/
+.holder {
 				padding:3px;
 				margin-left:auto;
 				margin-right:auto;
@@ -115,48 +116,4 @@
 			#johnlei:hover{
 				background-color: #2f96b4;
 			}
-		</style>
-		<script src="js/jquery.js"></script>
-        <script>
-        $('#textb').live("keypress",function(e){
-			if(e.keyCode ==13)
-			{
-				$("johnlei").click();
-			}
-		});
-        </script>
-	</head>
-	<body>
-	<div class="holder">
-		<label="welcomemsg">WELCOME: </label><label for="name"><?php echo $username; ?></label>
-			<div class="style">	
-				<div class="alpha">
-					<b align="center">You can view your chats here:</b>
-					<input name="user" type="hidden" id="texta" value="<?php echo $username ?>"/>
-					<div class="refresh">
-					</div>
-					<br/>
-					<form name="newMessage" class="newMessage" action="" onSubmit="return false">
-						<select name="recipient" id="recipient" style="width:270px;">
-							<option>--Send Chat To--</option>
-								<?php 
-									$sql = "SELECT * FROM tbllogin where username!='$username' ORDER BY username";
-									$qry = $con->prepare($sql);
-									$qry->execute();
-									$fetch = $qry->fetchAll();
-									foreach ($fetch as $fe):
-										$name = $fe['username'];
-								?>
-									<option title="<?php echo $name; ?>"><?php echo $fe['username']; ?> </option>
-								<?php endforeach; ?>
-						</select>
-					<textarea name="textb" id="textb">Enter your message here</textarea>
-					<input name="submit" type="submit" value="Send" id="johnlei" />
-				</form>
-			</div>
-		</div>
-		<script src="js/sendchat.js" type="text/javascript"></script>
-		<script src="js/refresh.js" type="text/javascript"></script>
-	</div>	
-	</body>
-</html>
+/*chat page*/

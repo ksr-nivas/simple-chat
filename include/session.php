@@ -120,23 +120,25 @@ class Session
     * of that information in the database and creates the session.
     * Effectively logging in the user if all goes well.
     */
-   function login($subuser, $subpass, $subremember){
+   function login($subuser, $subpass){
       global $database, $form;  //The database and form object
 
       /* Username error checking */
-      $field = "user";  //Use field name for username
+      $field = "username";  //Use field name for username
       if(!$subuser || strlen($subuser = trim($subuser)) == 0){
-         $form->setError($field, "* Username not entered");
+         $form->setError($field, "* Email id not entered");
       }
       else{
          /* Check if username is not alphanumeric */
-         if(!eregi("^([0-9a-z])*$", $subuser)){
-            $form->setError($field, "* Username not alphanumeric");
-         }
+         if (!filter_var($subuser, FILTER_VALIDATE_EMAIL) === false) {
+            
+         }else{
+			 $form->setError($field, "* Invalid email id");
+		 }
       }
 
       /* Password error checking */
-      $field = "pass";  //Use field name for password
+      $field = "password";  //Use field name for password
       if(!$subpass){
          $form->setError($field, "* Password not entered");
       }
@@ -148,15 +150,16 @@ class Session
 
       /* Checks that username is in database and password is correct */
       $subuser = stripslashes($subuser);
-      $result = $database->confirmUserPass($subuser, md5($subpass));
+      $result = $database->confirmUserPass($subuser, $subpass);
+	  //print_r($result); exit;
 
       /* Check error codes */
       if($result == 1){
-         $field = "user";
+         $field = "username";
          $form->setError($field, "* Username not found");
       }
       else if($result == 2){
-         $field = "pass";
+         $field = "password";
          $form->setError($field, "* Invalid password");
       }
       
@@ -168,7 +171,7 @@ class Session
       /* Username and password correct, register session variables */
       $this->userinfo  = $database->getUserInfo($subuser);
       $this->username  = $_SESSION['username'] = $this->userinfo['username'];
-      $this->userid    = $_SESSION['userid']   = $this->generateRandID();
+      $this->userid    = $_SESSION['userid']   = $this->userinfo['userid'];
       $this->userlevel = $this->userinfo['userlevel'];
       
       /* Insert userid into database and update active users table */
@@ -183,10 +186,10 @@ class Session
        * specified in constants.php. Now, next time he comes to our site, we will
        * log him in automatically, but only if he didn't log out before he left.
        */
-      if($subremember){
+      /*if($subremember){
          setcookie("cookname", $this->username, time()+COOKIE_EXPIRE, COOKIE_PATH);
          setcookie("cookid",   $this->userid,   time()+COOKIE_EXPIRE, COOKIE_PATH);
-      }
+      }*/
 
       /* Login completed successfully */
       return true;
@@ -316,7 +319,7 @@ class Session
       }
       /* No errors, add the new account to the */
       else{
-         if($database->addNewUser($subuser, md5($subpass), $subemail)){
+         if($database->addNewUser($subuser, $subpass, $subemail)){
             if(EMAIL_WELCOME){
                $mailer->sendWelcome($subuser,$subemail,$subpass);
             }
@@ -351,7 +354,7 @@ class Session
                $form->setError($field, "* Current Password incorrect");
             }
             /* Password entered is incorrect */
-            if($database->confirmUserPass($this->username,md5($subcurpass)) != 0){
+            if($database->confirmUserPass($this->username,$subcurpass) != 0){
                $form->setError($field, "* Current Password incorrect");
             }
          }
@@ -395,7 +398,7 @@ class Session
       
       /* Update password since there were no errors */
       if($subcurpass && $subnewpass){
-         $database->updateUserField($this->username,"password",md5($subnewpass));
+         $database->updateUserField($this->username,"password",$subnewpass);
       }
       
       /* Change Email */
@@ -447,34 +450,15 @@ class Session
    
    
    
-   function Vinayak($vuser,$vpass)
+   function chatInsert($user,$message)
    {
 	   global $database, $form;
 	   
+	   $time = time();
+	   $result = $database->chatInsert($vuser, $vpass);
 	   
-	   $field="user";
-	   if(strlen($vuser)=="")
-	   {
-		   $form->setError($field, "* user name should not be empty");
+	   if($database->addNewUser($subuser, md5($subpass), $subemail)){
 	   }
-	   
-	   
-	   $field="pwd";
-	   if(strlen($vpass)=="")
-	   {
-		   $form->setError($field, "* password should not be empty");
-	   }
-	   
-	   
-	   
-	   if($form->num_errors >0)
-	   {
-		   return false;
-	   }
-	   
-	   
-	   
-	   $result = $database->confirmUserPass($vuser, md5($vpass));
 	   
 	   
 	   if($result == 1){

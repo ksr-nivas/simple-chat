@@ -57,7 +57,8 @@ class Process
    function procLogin(){
       global $session, $form;
       /* Login attempt */
-      $retval = $session->login($_POST['user'], $_POST['pass'], isset($_POST['remember']));
+      $retval = $session->login($_POST['username'], $_POST['password']);
+	  //var_dump($retval); exit;
       
       /* Login successful */
       if($retval){
@@ -194,11 +195,11 @@ class Process
    
    
    
-   function proc()
+   function chatInsert()
    {
 	   global $session, $form;
 	   
-	   $retval = $session->login($_POST['user'],$_POST['password']);
+	   $retval = $session->chatInsert($_POST['user'],$_POST['message']);
 	   
 	   
 	   if($retval){
